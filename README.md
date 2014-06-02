@@ -8,5 +8,7 @@ my scheme library for picrin (https://github.com/wasabiz/picrin)
   `/util`
 * Machine learning
   `/learning`
+* SRFI
+  `/srfi`
 * Miscellaneous
   `/misc`
