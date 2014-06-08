@@ -1,5 +1,16 @@
 (define-library (srfi 17)
-  (import (scheme base)
+
+  (define-library (rename set!)
+    (import (scheme base))
+    (export (rename set! set!%)
+	    define-syntax
+	    syntax-rules
+	    lambda
+	    if
+	    quote
+	    begin))
+
+  (import (rename set!)
 	  (srfi 1))
   
   (define-syntax set!
@@ -7,7 +18,7 @@
       ((_ (sttr arg ...) value)
        ((setter sttr) arg ... value))
       ((_ v1 v2)
-       (set! v1 v2))))
+       (set!% v1 v2))))
 
   (define setter-alist
     '((car . set-car!)

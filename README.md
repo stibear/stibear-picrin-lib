@@ -10,5 +10,6 @@ my scheme library for picrin (https://github.com/wasabiz/picrin)
   `/learning`
 * SRFI
   `/srfi`
+  (temporarily until included in picrin)
 * Miscellaneous
   `/misc`
