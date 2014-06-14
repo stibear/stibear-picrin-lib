@@ -1,6 +1,7 @@
 (define-library (srfi 17)
   (import (scheme base)
-          (srfi 1))
+          (srfi 1)
+          (picrin dictionary))
   
   (define-syntax update!
     (syntax-rules ()
@@ -8,30 +9,29 @@
        ((setter proc) args ... val))
       ((_ var val)
        (set! var val))))
-
-  (define setter-alist
-    `((,car . ,set-car!)
-      (,cdr . ,set-cdr!)
-      (,caar . ,(lambda (p v) (set-car! (car p) v)))
-      (,cadr . ,(lambda (p v) (set-car! (cdr p) v)))
-      (,cdar . ,(lambda (p v) (set-cdr! (car p) v)))
-      (,cddr . ,(lambda (p v) (set-cdr! (cdr p) v)))
-      (,vector-ref . ,vector-set!)
-      (,string-ref . ,string-set!)
-      (,bytevector-u8-ref . ,bytevector-u8-set!)
-      (,list-ref . ,list-set!)))
+  
+  ;; now, dictionary will take only symbols as its keys
+  (define setter-dict
+    (let ((dict (dictionary)))
+      (dictionary-set! dict car set-car!)
+      (dictionary-set! dict cdr set-cdr!)
+      (dictionary-set! dict caar (lambda (p v) (set-car! (car p) v)))
+      (dictionary-set! dict cadr (lambda (p v) (set-car! (cdr p) v)))
+      (dictionary-set! dict cdar (lambda (p v) (set-cdr! (car p) v)))
+      (dictionary-set! dict cddr (lambda (p v) (set-cdr! (cdr p) v)))
+      (dictionary-set! dict vector-ref vector-set!)
+      (dictionary-set! dict string-ref string-set!)
+      (dictionary-set! dict bytevector-u8-ref bytevector-u8-set!)
+      (dictionary-set! dict list-ref list-set!)
+      dict))
 
   (define setter
     (letrec ((setter
               (lambda (proc)
-                (let ((probe (assv proc setter-alist)))
-                  (if probe
-                      (cdr probe)
-                      (error "No setter for " proc)))))
+                (dictionary-ref dict proc)))
              (set-setter!
               (lambda (proc setter)
-                (update! setter-alist
-                         (alist-cons proc setter setter-alist)))))
+                (dictionary-set! setter-dict proc setter))))
       (set-setter! setter set-setter!)
       setter))
 
