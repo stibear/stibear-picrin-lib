@@ -17,9 +17,7 @@
         (values 1 dotp))))
 
 (define *c* 0.5)
-(define *counter* 10)
-
-(define (dprint x) (print x) x)
+(define *counter* 100)
 
 (define (train w x t . c)
   (let ((c (if (null? c) *c* c)))
