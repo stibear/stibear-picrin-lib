@@ -1,25 +1,39 @@
 (define-library (srfi 17)
-  (import (scheme base)
+
+  (define-library (rename set!)
+    (import (scheme base))
+    (export (rename set! %set!)
+            define
+            quasiquote
+            letrec
+            let
+            error
+            apply
+            define-syntax
+            syntax-rules
+            lambda
+            if
+            quote
+            begin
+            vector-ref
+            string-ref
+            bytevector-u8-ref
+            vector-set!
+            string-set!
+            bytevector-u8-set!
+            list-set!))
+  
+  (import (rename set!)
           (srfi 1))
   
-  (define-syntax update!
+  (define-syntax set!
     (syntax-rules ()
       ((_ (proc args ...) val)
        ((setter proc) args ... val))
       ((_ var val)
-       (set! var val))))
+       (%set! var val))))
 
-  (define setter-alist
-    `((,car . ,set-car!)
-      (,cdr . ,set-cdr!)
-      (,caar . ,(lambda (p v) (set-car! (car p) v)))
-      (,cadr . ,(lambda (p v) (set-car! (cdr p) v)))
-      (,cdar . ,(lambda (p v) (set-cdr! (car p) v)))
-      (,cddr . ,(lambda (p v) (set-cdr! (cdr p) v)))
-      (,vector-ref . ,vector-set!)
-      (,string-ref . ,string-set!)
-      (,bytevector-u8-ref . ,bytevector-u8-set!)
-      (,list-ref . ,list-set!)))
+  (define setter-alist '())
 
   (define setter
     (letrec ((setter
@@ -30,16 +44,27 @@
                       (error "No setter for " proc)))))
              (set-setter!
               (lambda (proc setter)
-                (update! setter-alist
-                         (alist-cons proc setter setter-alist)))))
+                (set! setter-alist
+                      (alist-cons proc setter setter-alist)))))
       (set-setter! setter set-setter!)
+      (set-setter! car set-car!)
+      (set-setter! cdr set-cdr!)
+      (set-setter! caar (lambda (p v) (set-car! (car p) v)))
+      (set-setter! cadr (lambda (p v) (set-car! (cdr p) v)))
+      (set-setter! cdar (lambda (p v) (set-cdr! (car p) v)))
+      (set-setter! cddr (lambda (p v) (set-cdr! (cdr p) v)))
+      (set-setter! vector-ref vector-set!)
+      (set-setter! string-ref string-set!)
+      (set-setter! bytevector-u8-ref bytevector-u8-set!)
+      (set-setter! list-ref list-set!)
       setter))
 
   (define (getter-with-setter get set)
     (let ((proc (lambda args (apply get args))))
-      (update! (setter proc) set)
+      (set! (setter proc) set)
       proc))
 
-  (export update!
+  (export set!
           setter
-          getter-with-setter))
+          getter-with-setter
+          setter-alist))
