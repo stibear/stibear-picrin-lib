@@ -2,9 +2,9 @@
         (srfi 43))
 
 (define (dot* v1 v2)
-  (vector-fold
+   (vector-fold
    (lambda (index x y) (+ x y))
-   0
+   0 
    (vector-map
     (lambda (i a b)
       (* a b))
