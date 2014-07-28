@@ -30,7 +30,7 @@
            (vector-map (lambda (a) (* t c a)) x))))))
 
 
-;; test case (and)
+;; test case (and/or)
 (define test-and-x
   '(#(1 1 1)
     #(1 1 0)
@@ -70,6 +70,7 @@
 (define percep-and (percep test-and-x test-and-t first-weight))
 (define percep-or (percep test-or-x test-or-t first-weight))
 
+#|
 (percep-and #(1 1 1)) ; => 1
 (percep-and #(1 1 0)) ; => -1
 (percep-and #(1 0 1)) ; => -1
@@ -79,3 +80,4 @@
 (percep-or #(1 1 0)) ; => 1
 (percep-or #(1 0 1)) ; => 1
 (percep-or #(1 0 0)) ; => -1
+|#
